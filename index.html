@@ -18,7 +18,14 @@
       <div class="jumbotron">
         <h1 class="display-4">Send Message</h1>
         <br />
-        <input type="text" class="form-control" placeholder="Name" />
+        <input id="name" type="text" class="form-control" placeholder="Name" />
+        <br />
+        <textarea
+          id="message"
+          type="text"
+          class="form-control"
+          placeholder="Message"
+        ></textarea>
         <br />
         <button id="send" class="btn btn-success">Send</button>
       </div>
@@ -38,13 +45,20 @@
       integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
       crossorigin="anonymous"
     ></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
+      var socket = io();
       $(() => {
         $("#send").click(() => {
-          addMessages({ name: "Tim", message: "Hello" });
+          var message = {
+            name: $("#name").val(),
+            message: $("#message").val()
+          };
+          postMessage(message);
         });
         getMessages();
       });
+      socket.on("message", addMessages);
       function addMessages(message) {
         $("#messages").append(
           `<h4>${message.name}</h4><p>${message.message}</p>`
@@ -54,6 +68,9 @@
         $.get("http://localhost:3000/messages", (data) => {
           data.forEach(addMessages);
         });
+      }
+      function postMessage(message) {
+        $.post("http://localhost:3000/messages", message);
       }
     </script>
   </body>
